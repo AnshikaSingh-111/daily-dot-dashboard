@@ -1,21 +1,24 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useHabits } from "../context/HabitContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format, parseISO, subDays } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ProgressChart: React.FC = () => {
   const { historyData } = useHabits();
   
-  // Sort and slice to get the last 7 days data
-  const chartData = [...historyData]
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .slice(-7)
-    .map(item => ({
-      ...item,
-      date: format(parseISO(item.date), "MMM dd")
-    }));
+  // Use useMemo to avoid recalculating on every render
+  const chartData = useMemo(() => {
+    return [...historyData]
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(-7)
+      .map(item => ({
+        ...item,
+        date: format(parseISO(item.date), "MMM dd")
+      }));
+  }, [historyData]);
 
   // Custom tooltip for the chart
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -30,6 +33,22 @@ const ProgressChart: React.FC = () => {
     }
     return null;
   };
+
+  // Show loading state if no data
+  if (!chartData.length) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold">Habit Progress</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] w-full">
+            <Skeleton className="h-full w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">

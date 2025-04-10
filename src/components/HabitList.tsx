@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { memo } from "react";
 import HabitItem from "./HabitItem";
 import { useHabits } from "../context/HabitContext";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ const HabitList: React.FC = () => {
       
       <div>
         {habits.map(habit => (
-          <HabitItem 
+          <MemoizedHabitItem 
             key={habit.id} 
             habit={habit} 
             onToggle={toggleHabit} 
@@ -35,5 +35,8 @@ const HabitList: React.FC = () => {
     </div>
   );
 };
+
+// Memoize the HabitItem to prevent unnecessary re-renders
+const MemoizedHabitItem = memo(HabitItem);
 
 export default HabitList;

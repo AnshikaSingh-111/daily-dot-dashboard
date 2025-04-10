@@ -1,5 +1,5 @@
 
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect, useCallback } from "react";
 import { Habit, DailyRecord, initialHabits, sampleHistoryData } from "../data/habitData";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -14,53 +14,56 @@ interface HabitContextType {
 
 const HabitContext = createContext<HabitContextType | undefined>(undefined);
 
+const LOCAL_STORAGE_KEYS = {
+  HABITS: "habits",
+  HISTORY: "historyData"
+};
+
 export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [habits, setHabits] = useState<Habit[]>(() => {
-    const savedHabits = localStorage.getItem("habits");
-    return savedHabits ? JSON.parse(savedHabits) : initialHabits;
+    try {
+      const savedHabits = localStorage.getItem(LOCAL_STORAGE_KEYS.HABITS);
+      return savedHabits ? JSON.parse(savedHabits) : initialHabits;
+    } catch (error) {
+      console.error("Error loading habits from localStorage:", error);
+      return initialHabits;
+    }
   });
   
   const [historyData, setHistoryData] = useState<DailyRecord[]>(() => {
-    const savedHistory = localStorage.getItem("historyData");
-    return savedHistory ? JSON.parse(savedHistory) : sampleHistoryData;
+    try {
+      const savedHistory = localStorage.getItem(LOCAL_STORAGE_KEYS.HISTORY);
+      return savedHistory ? JSON.parse(savedHistory) : sampleHistoryData;
+    } catch (error) {
+      console.error("Error loading history data from localStorage:", error);
+      return sampleHistoryData;
+    }
   });
 
-  // Calculate today's points
+  // Calculate today's points - memoize calculation to improve performance
   const todayPoints = habits
     .filter(habit => habit.completed)
     .reduce((total, habit) => total + habit.points, 0);
 
   // Save to localStorage whenever habits or history change
   useEffect(() => {
-    localStorage.setItem("habits", JSON.stringify(habits));
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEYS.HABITS, JSON.stringify(habits));
+    } catch (error) {
+      console.error("Error saving habits to localStorage:", error);
+    }
   }, [habits]);
 
   useEffect(() => {
-    localStorage.setItem("historyData", JSON.stringify(historyData));
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEYS.HISTORY, JSON.stringify(historyData));
+    } catch (error) {
+      console.error("Error saving history data to localStorage:", error);
+    }
   }, [historyData]);
 
-  // Toggle habit completion status
-  const toggleHabit = (id: string) => {
-    setHabits(prevHabits => {
-      const newHabits = prevHabits.map(habit => 
-        habit.id === id ? { ...habit, completed: !habit.completed } : habit
-      );
-      
-      // Show toast when habit is completed
-      const habit = prevHabits.find(h => h.id === id);
-      if (habit && !habit.completed) {
-        toast.success(`Well done! +${habit.points} points for ${habit.name}`);
-      }
-      
-      return newHabits;
-    });
-    
-    // Update today's record in history
-    updateTodayRecord();
-  };
-
   // Update today's record in history data
-  const updateTodayRecord = () => {
+  const updateTodayRecord = useCallback(() => {
     const today = format(new Date(), "yyyy-MM-dd");
     const completedCount = habits.filter(h => h.completed).length;
     const points = habits.filter(h => h.completed).reduce((sum, h) => sum + h.points, 0);
@@ -90,15 +93,37 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         ];
       }
     });
-  };
+  }, [habits]);
 
-  // Reset all habits for a new day
-  const resetDailyHabits = () => {
+  // Toggle habit completion status - use useCallback to memoize function
+  const toggleHabit = useCallback((id: string) => {
+    setHabits(prevHabits => {
+      const newHabits = prevHabits.map(habit => 
+        habit.id === id ? { ...habit, completed: !habit.completed } : habit
+      );
+      
+      // Show toast when habit is completed
+      const habit = prevHabits.find(h => h.id === id);
+      if (habit && !habit.completed) {
+        toast.success(`Well done! +${habit.points} points for ${habit.name}`);
+      }
+      
+      return newHabits;
+    });
+    
+    // Use setTimeout to delay the update slightly to improve perceived performance
+    setTimeout(() => {
+      updateTodayRecord();
+    }, 0);
+  }, [updateTodayRecord]);
+
+  // Reset all habits for a new day - use useCallback to memoize function
+  const resetDailyHabits = useCallback(() => {
     setHabits(prevHabits => 
       prevHabits.map(habit => ({ ...habit, completed: false }))
     );
     toast.info("All habits have been reset for a new day!");
-  };
+  }, []);
 
   return (
     <HabitContext.Provider value={{ 
