@@ -19,7 +19,7 @@ export const initialHabits: Habit[] = [
   {
     id: "1",
     name: "Morning Yoga",
-    icon: "yoga",
+    icon: "Yoga",
     points: 10,
     color: "habit-purple",
     completed: false
@@ -27,7 +27,7 @@ export const initialHabits: Habit[] = [
   {
     id: "2",
     name: "Waking up early",
-    icon: "sunrise",
+    icon: "Sunrise",
     points: 15,
     color: "habit-orange",
     completed: false
@@ -35,7 +35,7 @@ export const initialHabits: Habit[] = [
   {
     id: "3",
     name: "Reading book",
-    icon: "book-open",
+    icon: "BookOpen",
     points: 20,
     color: "habit-blue",
     completed: false
@@ -43,7 +43,7 @@ export const initialHabits: Habit[] = [
   {
     id: "4",
     name: "Drink 5L of water",
-    icon: "droplets",
+    icon: "Droplets",
     points: 10,
     color: "habit-blue",
     completed: false
@@ -51,7 +51,7 @@ export const initialHabits: Habit[] = [
   {
     id: "5",
     name: "Meditation",
-    icon: "brain",
+    icon: "Brain",
     points: 15,
     color: "habit-purple",
     completed: false
@@ -59,7 +59,7 @@ export const initialHabits: Habit[] = [
   {
     id: "6",
     name: "Exercise",
-    icon: "dumbbell",
+    icon: "Dumbbell",
     points: 20,
     color: "habit-green",
     completed: false

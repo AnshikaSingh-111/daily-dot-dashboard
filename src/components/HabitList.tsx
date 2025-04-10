@@ -4,9 +4,10 @@ import HabitItem from "./HabitItem";
 import { useHabits } from "../context/HabitContext";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
+import AddHabitForm from "./AddHabitForm";
 
 const HabitList: React.FC = () => {
-  const { habits, toggleHabit, resetDailyHabits } = useHabits();
+  const { habits, toggleHabit, resetDailyHabits, deleteHabit } = useHabits();
 
   return (
     <div className="mb-6">
@@ -23,15 +24,18 @@ const HabitList: React.FC = () => {
         </Button>
       </div>
       
-      <div>
+      <div className="mb-4">
         {habits.map(habit => (
           <MemoizedHabitItem 
             key={habit.id} 
             habit={habit} 
-            onToggle={toggleHabit} 
+            onToggle={toggleHabit}
+            onDelete={deleteHabit}
           />
         ))}
       </div>
+      
+      <AddHabitForm />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import React, { createContext, useState, useContext, useEffect, useCallback } fr
 import { Habit, DailyRecord, initialHabits, sampleHistoryData } from "../data/habitData";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
 
 interface HabitContextType {
   habits: Habit[];
@@ -10,6 +11,8 @@ interface HabitContextType {
   todayPoints: number;
   toggleHabit: (id: string) => void;
   resetDailyHabits: () => void;
+  addHabit: (habit: Omit<Habit, "id" | "completed">) => void;
+  deleteHabit: (id: string) => void;
 }
 
 const HabitContext = createContext<HabitContextType | undefined>(undefined);
@@ -95,7 +98,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   }, [habits]);
 
-  // Toggle habit completion status - use useCallback to memoize function
+  // Toggle habit completion status
   const toggleHabit = useCallback((id: string) => {
     setHabits(prevHabits => {
       const newHabits = prevHabits.map(habit => 
@@ -117,7 +120,38 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }, 0);
   }, [updateTodayRecord]);
 
-  // Reset all habits for a new day - use useCallback to memoize function
+  // Add a new habit
+  const addHabit = useCallback((habitData: Omit<Habit, "id" | "completed">) => {
+    const newHabit: Habit = {
+      ...habitData,
+      id: uuidv4(),
+      completed: false
+    };
+    
+    setHabits(prevHabits => [...prevHabits, newHabit]);
+    toast.success(`New habit "${habitData.name}" added`);
+  }, []);
+
+  // Delete a habit
+  const deleteHabit = useCallback((id: string) => {
+    setHabits(prevHabits => {
+      const habitToDelete = prevHabits.find(h => h.id === id);
+      const filteredHabits = prevHabits.filter(habit => habit.id !== id);
+      
+      if (habitToDelete) {
+        toast.info(`"${habitToDelete.name}" has been deleted`);
+      }
+      
+      return filteredHabits;
+    });
+    
+    // Update today's record after deleting a habit
+    setTimeout(() => {
+      updateTodayRecord();
+    }, 0);
+  }, [updateTodayRecord]);
+
+  // Reset all habits for a new day
   const resetDailyHabits = useCallback(() => {
     setHabits(prevHabits => 
       prevHabits.map(habit => ({ ...habit, completed: false }))
@@ -131,7 +165,9 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       historyData, 
       todayPoints, 
       toggleHabit, 
-      resetDailyHabits 
+      resetDailyHabits,
+      addHabit,
+      deleteHabit
     }}>
       {children}
     </HabitContext.Provider>

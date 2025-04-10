@@ -5,13 +5,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Trash2 } from "lucide-react";
 
 interface HabitItemProps {
   habit: Habit;
   onToggle: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
-const HabitItem: React.FC<HabitItemProps> = ({ habit, onToggle }) => {
+const HabitItem: React.FC<HabitItemProps> = ({ habit, onToggle, onDelete }) => {
   // Dynamically get the appropriate icon from Lucide
   const IconComponent = (Icons as any)[habit.icon] || Icons.Activity;
   
@@ -65,6 +67,17 @@ const HabitItem: React.FC<HabitItemProps> = ({ habit, onToggle }) => {
         )}>
           <IconComponent size={20} className={habit.completed ? "animate-bounce-small" : ""} />
         </div>
+        
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(habit.id);
+          }}
+          className="ml-2 p-2 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50"
+          aria-label="Delete habit"
+        >
+          <Trash2 size={18} />
+        </button>
       </div>
     </Card>
   );
