@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import * as Icons from "lucide-react";
+import * as LucideIcons from "lucide-react";
 
 const iconOptions = [
   "Activity", "Book", "BookOpen", "Brain", "Calendar", "Coffee", 
@@ -64,6 +64,12 @@ const AddHabitForm = () => {
     setOpen(false);
   };
 
+  // Function to render icon component
+  const renderIcon = (iconName: string) => {
+    const IconComponent = (LucideIcons as any)[iconName];
+    return IconComponent ? <IconComponent size={16} /> : null;
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -99,7 +105,7 @@ const AddHabitForm = () => {
                   {iconOptions.map((icon) => (
                     <SelectItem key={icon} value={icon}>
                       <div className="flex items-center gap-2">
-                        {React.createElement((Icons as any)[icon], { size: 16 })}
+                        {renderIcon(icon)}
                         <span>{icon}</span>
                       </div>
                     </SelectItem>
