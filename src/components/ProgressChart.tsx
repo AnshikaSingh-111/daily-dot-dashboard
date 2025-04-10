@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, parseISO } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CalendarDays } from "lucide-react";
 
 const ProgressChart: React.FC = () => {
   const { historyData } = useHabits();
@@ -34,7 +35,7 @@ const ProgressChart: React.FC = () => {
     return null;
   };
 
-  // Show loading state if no data
+  // Empty state when no data is available
   if (!chartData.length) {
     return (
       <Card className="w-full">
@@ -42,8 +43,14 @@ const ProgressChart: React.FC = () => {
           <CardTitle className="text-xl font-bold">Habit Progress</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px] w-full">
-            <Skeleton className="h-full w-full" />
+          <div className="h-[300px] w-full flex flex-col items-center justify-center text-center p-6">
+            <div className="bg-gray-100 p-4 rounded-full mb-4">
+              <CalendarDays className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">No data yet</h3>
+            <p className="text-gray-500 max-w-xs">
+              Complete some habits to start tracking your progress. Your daily achievements will appear here.
+            </p>
           </div>
         </CardContent>
       </Card>

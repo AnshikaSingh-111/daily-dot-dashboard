@@ -66,13 +66,5 @@ export const initialHabits: Habit[] = [
   }
 ];
 
-// Sample history data for the chart
-export const sampleHistoryData: DailyRecord[] = [
-  { date: "2025-04-04", totalPoints: 45, completedHabits: 3 },
-  { date: "2025-04-05", totalPoints: 60, completedHabits: 4 },
-  { date: "2025-04-06", totalPoints: 30, completedHabits: 2 },
-  { date: "2025-04-07", totalPoints: 75, completedHabits: 5 },
-  { date: "2025-04-08", totalPoints: 50, completedHabits: 3 },
-  { date: "2025-04-09", totalPoints: 65, completedHabits: 4 },
-  { date: "2025-04-10", totalPoints: 0, completedHabits: 0 }
-];
+// Empty history data for the chart - the user will build their own data
+export const sampleHistoryData: DailyRecord[] = [];
